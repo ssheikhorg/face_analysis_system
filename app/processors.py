@@ -159,13 +159,17 @@ class FacialSVGProcessor:
                 cx2 = (x2 + x3) / 2
                 cy2 = (y2 + y3) / 2
 
-                path_commands.append(f"C {cx1:.2f} {cy1:.2f} {cx2:.2f} {cy2:.2f} {x2:.2f} {y2:.2f}")
+                path_commands.append(
+                    f"C {cx1:.2f} {cy1:.2f} {cx2:.2f} {cy2:.2f} {x2:.2f} {y2:.2f}"
+                )
 
         # Close the path
         path_commands.append("Z")
         return " ".join(path_commands)
 
-    def _create_landmark_based_regions(self, landmarks: List[LandmarkPoint]) -> Dict[int, List[LandmarkPoint]]:
+    def _create_landmark_based_regions(
+        self, landmarks: List[LandmarkPoint]
+    ) -> Dict[int, List[LandmarkPoint]]:
         """Create regions based on landmark groupings as fallback"""
         contours = {}
 
@@ -175,7 +179,7 @@ class FacialSVGProcessor:
                 1: list(range(10, 30)),  # Forehead
                 2: list(range(50, 70)),  # Left cheek
                 3: list(range(280, 300)),  # Right cheek
-                4: list(range(150, 170))  # Chin
+                4: list(range(150, 170)),  # Chin
             }
 
             for region_id, indices in region_definitions.items():
@@ -202,7 +206,9 @@ class FacialSVGProcessor:
             if len(seg_image.shape) == 3:
                 print(f"Color image - channels: {seg_image.shape[2]}")
                 # Check if it's using specific colors for regions
-                unique_colors = np.unique(seg_image.reshape(-1, seg_image.shape[2]), axis=0)
+                unique_colors = np.unique(
+                    seg_image.reshape(-1, seg_image.shape[2]), axis=0
+                )
                 print(f"Unique colors (first 10): {unique_colors[:10]}")
             else:
                 print(f"Grayscale image - unique values: {np.unique(seg_image)}")
@@ -212,8 +218,9 @@ class FacialSVGProcessor:
             print(f"Error debugging segmentation: {e}")
             return False
 
-    def process_segmentation_map(self, segmentation_base64: str, landmarks: List[LandmarkPoint]) -> Dict[
-        int, List[LandmarkPoint]]:
+    def process_segmentation_map(
+        self, segmentation_base64: str, landmarks: List[LandmarkPoint]
+    ) -> Dict[int, List[LandmarkPoint]]:
         """Process segmentation map to extract region contours"""
         print("=== DEBUG SEGMENTATION PROCESSING ===")
 
@@ -241,7 +248,9 @@ class FacialSVGProcessor:
                     mask = (seg_image == region_id).astype(np.uint8) * 255
 
                     # Find contours
-                    region_contours, _ = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+                    region_contours, _ = cv2.findContours(
+                        mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE
+                    )
 
                     if region_contours:
                         # Get the largest contour for this region
@@ -249,7 +258,9 @@ class FacialSVGProcessor:
 
                         # Simplify/smooth the contour
                         epsilon = 0.005 * cv2.arcLength(largest_contour, True)
-                        smoothed_contour = cv2.approxPolyDP(largest_contour, epsilon, True)
+                        smoothed_contour = cv2.approxPolyDP(
+                            largest_contour, epsilon, True
+                        )
 
                         # Convert to LandmarkPoints
                         contour_points = []
@@ -257,7 +268,9 @@ class FacialSVGProcessor:
                             x, y = point[0]
                             contour_points.append(LandmarkPoint(x=float(x), y=float(y)))
 
-                        if len(contour_points) >= 3:  # Need at least 3 points for a polygon
+                        if (
+                            len(contour_points) >= 3
+                        ):  # Need at least 3 points for a polygon
                             contours[int(region_id)] = contour_points
                             print(f"Region {region_id}: {len(contour_points)} points")
 
@@ -265,7 +278,9 @@ class FacialSVGProcessor:
                     print(f"Error processing region {region_id}: {e}")
                     continue
 
-            print(f"Successfully extracted {len(contours)} regions from segmentation map")
+            print(
+                f"Successfully extracted {len(contours)} regions from segmentation map"
+            )
 
             # If no contours found from segmentation, fall back to landmark-based regions
             if not contours:

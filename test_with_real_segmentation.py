@@ -4,10 +4,10 @@ import base64
 
 # Read your actual images
 with open("images/original_image.png", "rb") as f:
-    real_image_b64 = base64.b64encode(f.read()).decode('utf-8')
+    real_image_b64 = base64.b64encode(f.read()).decode("utf-8")
 
 with open("images/segmentation_map.png", "rb") as f:
-    real_segmentation_b64 = base64.b64encode(f.read()).decode('utf-8')
+    real_segmentation_b64 = base64.b64encode(f.read()).decode("utf-8")
 
 # Use landmarks from your file
 landmarks = [
@@ -26,13 +26,13 @@ landmarks = [
     {"x": 476.2514768242836, "y": 747.2536146640778},
     {"x": 474.32571959495544, "y": 751.920211315155},
     {"x": 474.44620656967163, "y": 751.968663930893},
-    {"x": 470.855353474617, "y": 760.6266021728516}
+    {"x": 470.855353474617, "y": 760.6266021728516},
 ]
 
 payload = {
     "image": real_image_b64,
     "landmarks": landmarks,
-    "segmentation_map": real_segmentation_b64
+    "segmentation_map": real_segmentation_b64,
 }
 
 print("Testing with REAL segmentation map...")
@@ -40,10 +40,7 @@ print(f"Image size: {len(real_image_b64)} chars")
 print(f"Segmentation size: {len(real_segmentation_b64)} chars")
 print(f"Landmarks: {len(landmarks)} points")
 
-response = httpx.post(
-    "http://localhost:8000/api/v1/frontal/crop/submit",
-    json=payload
-)
+response = httpx.post("http://localhost:8000/api/v1/frontal/crop/submit", json=payload)
 
 print(f"Status: {response.status_code}")
 result = response.json()
@@ -51,5 +48,6 @@ print(f"Contours generated: {len(result.get('result', {}).get('mask_contours', {
 
 # Decode and check the SVG
 import base64
-svg_result = base64.b64decode(result.get('result', {}).get('svg', '')).decode('utf-8')
+
+svg_result = base64.b64decode(result.get("result", {}).get("svg", "")).decode("utf-8")
 print(f"SVG content preview: {svg_result[:200]}...")
