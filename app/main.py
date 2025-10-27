@@ -4,7 +4,6 @@ import logging
 from rich.logging import RichHandler
 
 from app.api.endpoints import router as api_router
-from app.core.config import settings
 
 # Set up rich logging
 logging.basicConfig(
