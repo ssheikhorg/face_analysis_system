@@ -1,7 +1,7 @@
 import base64
 import cv2
 import numpy as np
-from typing import List, Dict, Any
+from typing import List, Dict
 import logging
 from io import BytesIO
 from PIL import Image

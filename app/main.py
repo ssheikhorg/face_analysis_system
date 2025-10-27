@@ -3,7 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 import logging
 from prometheus_client import make_asgi_app, Counter, Histogram
 import time
-from app.models import ProcessRequest, ProcessResponse, ErrorResponse, JobStatusResponse
+from app.models import ProcessRequest, ErrorResponse, JobStatusResponse
 from app.processors import FacialSVGProcessor
 from app.celery_worker import process_image_task
 import uuid
