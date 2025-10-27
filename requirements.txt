@@ -9,3 +9,4 @@ celery
 redis
 prometheus-client
 python-multipart
+httpx
